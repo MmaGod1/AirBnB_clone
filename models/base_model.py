@@ -6,16 +6,6 @@ from datetime import datetime
 
 class BaseModel:
     """Represents the parent model for all other model for this project."""
-    def __init__(self):
-        """Initialize instances of BaseModel."""
-        self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
-
-    def save(self):
-        """updates the updated_at attribute with the current datetime"""
-        self.updated_at = datetime.now()
-  """Represents the parent class for all other classes for the AirBnB console project."""
   def __init__(self, *args, **kwargs):
     """Initialize instances of BaseModel."""
     if kwargs:
@@ -27,6 +17,10 @@ class BaseModel:
       else:
         self.id = str(uuid4())
         self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
+    def save(self):
+        """updates the updated_at attribute with the current datetime"""
         self.updated_at = datetime.now()
 
     def to_dict(self):
