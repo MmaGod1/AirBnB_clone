@@ -12,8 +12,8 @@ class BaseModel:
             for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':
                     value = datetime.fromisoformat(value)
-        if key != '__class__':
-            setattr(self, key, value)
+                    if key != '__class__':
+                        setattr(self, key, value)
         else:
             self.id = str(uuid4())
             self.created_at = datetime.now()
@@ -22,6 +22,7 @@ class BaseModel:
     def save(self):
         """updates the updated_at attribute with the current datetime"""
         self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """Returns a dictionary of the BaseModel
@@ -33,7 +34,7 @@ class BaseModel:
         inst_dict = self.__dict__.copy()
         inst_dict['__class__'] = self.__class__.__name__
         inst_dict['created_at'] = self.created_at.isoformat(timespec=micro)
-        inst_dict['updated_at'] = self.updated_at.isofor(timespec=micro)
+        inst_dict['updated_at'] = self.updated_at.isoformat(timespec=micro)
         return inst_dict
 
     def __str__(self):
