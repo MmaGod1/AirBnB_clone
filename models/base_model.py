@@ -6,18 +6,18 @@ from datetime import datetime
 
 class BaseModel:
     """Represents the parent model for all other model for this project."""
-  def __init__(self, *args, **kwargs):
-    """Initialize instances of BaseModel."""
-    if kwargs:
-      for key, value in kwargs.items():
-        if key == 'created_at' or key == 'updated_at':
-          value = datetime.fromisoformat(value)
+    def __init__(self, *args, **kwargs):
+        """Initialize instances of BaseModel."""
+        if kwargs:
+            for key, value in kwargs.items():
+                if key == 'created_at' or key == 'updated_at':
+                    value = datetime.fromisoformat(value)
         if key != '__class__':
             setattr(self, key, value)
-      else:
-        self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        else:
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
     def save(self):
         """updates the updated_at attribute with the current datetime"""
