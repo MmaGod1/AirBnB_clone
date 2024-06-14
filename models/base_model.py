@@ -5,11 +5,18 @@ from datetime import datetime
 
 class BaseModel:
   """Represents the parent class for all other classes for the AirBnB console project."""
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     """Initialize instances of BaseModel."""
-    self.id = str(uuid4())
-    self.created_at = datetime.now()
-    self.updated_at = datetime.now()
+    if kwargs:
+      for key, value in kwargs.items():
+        if key == 'created_at' or key == 'updated_at':
+          value = datetime.fromisoformat(value)
+        if key != '__class__':
+            setattr(self, key, value)
+      else:
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
   def save(self):
     """updates the updated_at attribute with the current datetime"""
