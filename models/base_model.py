@@ -22,7 +22,6 @@ class BaseModel:
     def save(self):
         """updates the updated_at attribute with the current datetime"""
         self.updated_at = datetime.now()
-        models.storage.save()
 
     def to_dict(self):
         """Returns a dictionary of the BaseModel
