@@ -15,6 +15,19 @@ class BaseModel:
     def save(self):
         """updates the updated_at attribute with the current datetime"""
         self.updated_at = datetime.now()
+  """Represents the parent class for all other classes for the AirBnB console project."""
+  def __init__(self, *args, **kwargs):
+    """Initialize instances of BaseModel."""
+    if kwargs:
+      for key, value in kwargs.items():
+        if key == 'created_at' or key == 'updated_at':
+          value = datetime.fromisoformat(value)
+        if key != '__class__':
+            setattr(self, key, value)
+      else:
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Returns a dictionary of the BaseModel
