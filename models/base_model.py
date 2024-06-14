@@ -29,15 +29,14 @@ class BaseModel:
         the dictionary includes the key-value pair, and
         a __class__ key indicating the class name.
         """
+        micro = 'microseconds'
         inst_dict = self.__dict__.copy()
         inst_dict['__class__'] = self.__class__.__name__
-        inst_dict['created_at'] = self.created_at.isoformat(
-                timespec='microseconds')
-        inst_dict['updated_at'] = self.updated_at.isoformat(
-                timespec='microseconds')
+        inst_dict['created_at'] = self.created_at.isoformat(timespec=micro)
+        inst_dict['updated_at'] = self.updated_at.isofor(timespec=micro)
         return inst_dict
 
     def __str__(self):
         """Return the str representation of the BaseModel instance."""
         class_name = self.__class__.__name__
-        return f"[{classname}] ({self.id}) {self.__dict__}"
+        return f"[{class_name}] ({self.id}) {self.__dict__}"
