@@ -18,7 +18,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
+            #storage.new(self)
 
     def save(self):
         """updates the updated_at attribute with the current datetime"""
