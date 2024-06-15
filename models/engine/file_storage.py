@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-"""Serializes instances to a JSON file and deserializes JSON file to instances"""
+"""Serializes instances to a JSON file and deserializes JSON to instances"""
 import json
 
 
 class FileStorage:
-    """A class for serializing and deserializing objects to and from a JSON file."""
+    """Serializing and deserialing objects to and from a JSON file."""
 
     __file_path: str = "file.json"
     __objects: dict = {}
@@ -26,7 +26,7 @@ class FileStorage:
             json.dump(self.__objects, f, indent=4)
 
     def reload(self):
-        """Deserializes the JSON file to the objects dictionary (if it exists)."""
+        """Deserializes the JSON file to the objects dict if it exists."""
         try:
             with open(self.__file_path, "r") as f:
                 self.__objects = json.load(f)
