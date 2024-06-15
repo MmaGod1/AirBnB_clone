@@ -1,10 +1,17 @@
+#!/usr/bin/python3
+"""Defines the HBnB console."""
 import cmd
 import shlex
 from models.base_model import BaseModel
 from models import storage
 
+# Define the storage classes available
+storage_classes = {
+    "BaseModel": BaseModel
+}
 
 class HBNBCommand(cmd.Cmd):
+    """Command interpreter for the HBNB project."""
     prompt = '(hbnb) '
 
     def do_create(self, arg):
@@ -15,15 +22,16 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
 
-        try:
-            new_instance = eval(arg)()
-            new_instance.save()
-            print(new_instance.id)
-        except NameError:
+        if arg not in storage_classes:
             print("** class doesn't exist **")
+            return
+
+        new_instance = storage_classes[arg]()
+        new_instance.save()
+        print(new_instance.id)
 
     def do_show(self, arg):
-        """Usage: show <class> <id> or <class>.show(<id>)
+        """Usage: show <class> <id>
         Display the string representation of a class instance of a given id.
         """
         args = shlex.split(arg)
@@ -32,7 +40,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         class_name = args[0]
-        if class_name not in storage.all():
+        if class_name not in storage_classes:
             print("** class doesn't exist **")
             return
 
@@ -49,15 +57,16 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_destroy(self, arg):
-        """Usage: destroy <class> <id> or <class>.destroy(<id>)
-        Delete a class instance of a given id."""
+        """Usage: destroy <class> <id>
+        Delete a class instance of a given id.
+        """
         args = shlex.split(arg)
         if len(args) < 1:
             print("** class name missing **")
             return
 
         class_name = args[0]
-        if class_name not in storage.all():
+        if class_name not in storage_classes:
             print("** class doesn't exist **")
             return
 
@@ -68,25 +77,24 @@ class HBNBCommand(cmd.Cmd):
         instance_id = args[1]
         key = "{}.{}".format(class_name, instance_id)
 
-        if key not in storage.all():
+        if key in storage.all():
+            del storage.all()[key]
+            storage.save()
+        else:
             print("** no instance found **")
-            return
-
-        del storage.all()[key]
-        storage.save()
 
     def do_all(self, arg):
-        """Usage: all or all <class> or <class>.all()
+        """Usage: all or all <class>
         Display string representations of all instances of a given class.
         If no class is specified, displays all instantiated objects.
         """
         args = shlex.split(arg)
-        if not arg or args[0] == "":
+        if not args:
             all_instances = [str(obj) for obj in storage.all().values()]
             print(all_instances)
         else:
             class_name = args[0]
-            if class_name not in storage.all():
+            if class_name not in storage_classes:
                 print("** class doesn't exist **")
                 return
             all_instances = [str(obj) for key, obj in storage.all().items()
@@ -94,11 +102,9 @@ class HBNBCommand(cmd.Cmd):
             print(all_instances)
 
     def do_update(self, arg):
-        """Usage: update <class> <id> <attribute_name> <attribute_value> or
-        <class>.update(<id>, <attribute_name>, <attribute_value>) or
-        <class>.update(<id>, <dictionary>)
+        """Usage: update <class> <id> <attribute_name> <attribute_value>
         Update a class instance of a given id by adding or updating
-        a given attribute key/value pair or dictionary.
+        a given attribute key/value pair.
         """
         args = shlex.split(arg)
         if len(args) < 1:
@@ -106,7 +112,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         class_name = args[0]
-        if class_name not in storage.all():
+        if class_name not in storage_classes:
             print("** class doesn't exist **")
             return
 
