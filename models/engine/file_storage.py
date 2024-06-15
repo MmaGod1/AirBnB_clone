@@ -33,4 +33,5 @@ class FileStorage:
                 for key, value in obj_dict.items():
                     cls_name, obj_id = key.split(".")
                     if cls_name == "BaseModel":
+                        value.pop('__class__', None)
                         self.__objects[key] = BaseModel(**value)
