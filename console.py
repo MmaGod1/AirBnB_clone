@@ -10,6 +10,7 @@ storage_classes = {
     "BaseModel": BaseModel
 }
 
+
 class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project."""
     prompt = '(hbnb) '
