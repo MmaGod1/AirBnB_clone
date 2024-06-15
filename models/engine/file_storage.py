@@ -5,7 +5,6 @@ import os
 from models.base_model import BaseModel
 
 
-
 class FileStorage:
     """Serializing and deserializing objects to and from a JSON file."""
 
@@ -24,11 +23,12 @@ class FileStorage:
     def save(self):
         """Serializes the objects dictionary to a JSON file."""
         with open(self.__file_path, "w") as f:
-            obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
+            obj_items = self.__objects.items()
+            obj_dict = {key: obj.to_dict() for key, obj in obj_items}
             json.dump(obj_dict, f)
 
     def reload(self):
-        """Deserializes the JSON file to the objects dictionary if it exists."""
+        """Deserializes the JSON file to the objects dictionary if it exists"""
         if os.path.exists(self.__file_path):
             with open(self.__file_path, "r") as f:
                 obj_dict = json.load(f)
