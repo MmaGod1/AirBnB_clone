@@ -2,6 +2,8 @@
 """Serializes instances to a JSON file and deserializes JSON to instances."""
 import json
 import os
+from models.base_model import BaseModel
+
 
 class FileStorage:
     """Serializing and deserializing objects to and from a JSON file."""
