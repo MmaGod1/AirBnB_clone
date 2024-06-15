@@ -53,30 +53,34 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_destroy(self, arg):
-        """Deletes an instance based on the class name and
-        id, updates JSON file."""
+        """Deletes an instance based on the class name and id, updates JSON file."""
         if not arg:
             print("** class name missing **")
             return
-
+            
         args = shlex.split(arg)
         if len(args) < 1:
             print("** class name missing **")
             return
-
+            
         class_name = args[0]
+        if class_name not in storage_classes:
+            print("** class doesn't exist **")
+            return
+            
         if len(args) < 2:
             print("** instance id missing **")
             return
-
+        
         instance_id = args[1]
         key = "{}.{}".format(class_name, instance_id)
-
-        if key in storage.all():
-            del storage.all()[key]
-            storage.save()
-        else:
+        
+        if key not in storage.all():
             print("** no instance found **")
+            return
+    
+    del storage.all()[key]
+    storage.save()
 
     def do_all(self, arg):
         """Prints all string representations of all
