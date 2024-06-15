@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Defines the BaseModel class."""
-import models.engine import storage
+from models.engine import storage
 from uuid import uuid4
 from datetime import datetime
 
