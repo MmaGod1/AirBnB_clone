@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 """Create a unique FileStorage instance for your application"""
-from models.engine import file_storage
+from models.engine.file_storage import FileStorage
 
-# Create a unique FileStorage instance
-storage = file_storage.FileStorage()
 
-# Call reload() method on the storage variable
+storage = FileStorage()
 storage.reload()
 
