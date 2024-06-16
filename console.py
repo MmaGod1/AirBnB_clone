@@ -17,7 +17,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Usage: create <class>
-        Create a new class instance and print its id.
+        Creates a new instance of BaseModel, saves it (to the JSON file) and prints the id.
         """
         if not arg:
             print("** class name missing **")
@@ -33,7 +33,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, arg):
         """Usage: show <class> <id>
-        Display the string representation of a class instance of a given id.
+        Prints the string representation of an instance based on the class name and id.
         """
         args = shlex.split(arg)
         if len(args) < 1:
@@ -59,7 +59,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, arg):
         """Usage: destroy <class> <id>
-        Delete a class instance of a given id.
+        Deletes an instance based on the class name and
+        id (save the change into the JSON file).
         """
         args = shlex.split(arg)
         if len(args) < 1:
@@ -86,7 +87,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Usage: all or all <class>
-        Display string representations of all instances of a given class.
+        Prints all string representation of all instances based or not on the class name.
         If no class is specified, displays all instantiated objects.
         """
         args = shlex.split(arg)
@@ -104,8 +105,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value>
-        Update a class instance of a given id by adding or updating
-        a given attribute key/value pair.
+        Updates an instance based on the class name and id by adding or
+        updating attribute (save the change into the JSON
         """
         args = shlex.split(arg)
         if len(args) < 1:
