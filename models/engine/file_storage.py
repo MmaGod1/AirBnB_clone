@@ -4,40 +4,36 @@ import json
 import os
 from models.base_model import BaseModel
 
-class FileStorage:
-    """Represent an abstracted storage engine.
 
-    Attributes:
-        __file_path (str): The name of the file to save objects to.
-        __objects (dict): A dictionary of instantiated objects.
-    """
+class FileStorage:
+    """Serializing and deserializing objects to and from a JSON file."""
+
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """Return the dictionary __objects."""
-        return FileStorage.__objects
+        """Returns the dictionary containing all stored objects."""
+        return self.__objects
 
     def new(self, obj):
-        """Set in __objects obj with key <obj_class_name>.id"""
-        ocname = obj.__class__.__name__
-        FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
+        """Adds a new object to the storage dictionary."""
+        key = f"{obj.__class__.__name__}.{obj.id}"
+        self.__objects[key] = obj
 
     def save(self):
-        """Serialize __objects to the JSON file __file_path."""
-        odict = FileStorage.__objects
-        objdict = {obj: odict[obj].to_dict() for obj in odict.keys()}
-        with open(FileStorage.__file_path, "w") as f:
-            json.dump(objdict, f)
+        """Serializes the objects dictionary to a JSON file."""
+        with open(self.__file_path, "w") as f:
+            obj_items = self.__objects.items()
+            obj_dict = {key: obj.to_dict() for key, obj in obj_items}
+            json.dump(obj_dict, f)
 
     def reload(self):
-        """Deserialize the JSON file __file_path to __objects, if it exists."""
-        try:
-            with open(FileStorage.__file_path) as f:
-                objdict = json.load(f)
-                for o in objdict.values():
-                    cls_name = o["__class__"]
-                    del o["__class__"]
-                    self.new(eval(cls_name)(**o))
-        except FileNotFoundError:
-            return
+        """Deserializes the JSON file to the objects dictionary if it exists"""
+        if os.path.exists(self.__file_path):
+            with open(self.__file_path, "r") as f:
+                obj_dict = json.load(f)
+                for key, value in obj_dict.items():
+                    cls_name, obj_id = key.split(".")
+                    if cls_name == "BaseModel":
+                        value.pop('__class__', None)
+                        self.__objects[key] = BaseModel(**value)
