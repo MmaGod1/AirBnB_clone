@@ -30,7 +30,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Usage: create <class>
-        Creates a new instance of BaseModel, saves it (to the JSON file) and prints the id.
+        Creates a new instance of BaseModel, saves
+        it (to the JSON file) and prints the id.
         """
         if not arg:
             print("** class name missing **")
@@ -46,7 +47,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, arg):
         """Usage: show <class> <id>
-        Prints the string representation of an instance based on the class name and id.
+        Prints the string representation of an
+        instance based on the class name and id.
         """
         args = shlex.split(arg)
         if len(args) < 1:
@@ -100,7 +102,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Usage: all or all <class>
-        Prints all string representation of all instances based or not on the class name.
+        Prints all string representation of all instances
+        based or not on the class name.
         If no class is specified, displays all instantiated objects.
         """
         args = shlex.split(arg)
