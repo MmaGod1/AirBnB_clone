@@ -37,6 +37,3 @@ class FileStorage:
                     cls_name, obj_id = key.split(".")
                     if cls_name == "BaseModel":
                         self.__objects[key] = BaseModel(**value)
-                    elif cls_name == "User":
-                        # Added handling for User
-                        self.__objects[key] = User(**value)
