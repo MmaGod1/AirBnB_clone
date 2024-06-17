@@ -8,7 +8,7 @@ from models import storage
 
 # Define the storage classes available
 storage_classes = {
-    "BaseModel": BaseModel
+    "BaseModel": BaseModel,
     "User": User
 }
 
