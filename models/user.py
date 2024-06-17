@@ -12,7 +12,6 @@ class User(BaseModel):
         first_name (str): The first name of the user.
         last_name (str): The last name of the user.
     """
-    def __init__(self):
         email = ""
         password = ""
         first_name = ""
