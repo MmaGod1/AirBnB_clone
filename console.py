@@ -3,6 +3,7 @@
 import cmd
 import shlex
 from models.base_model import BaseModel
+from models.base_model import User
 from models import storage
 
 # Define the storage classes available
