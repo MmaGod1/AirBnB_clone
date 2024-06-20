@@ -28,6 +28,20 @@ class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project."""
     prompt = '(hbnb) '
 
+    def default(self, line):
+        """Custom method dispatcher to handle <class name>.all() syntax."""
+        args = line.split('.')
+        if len(args) > 1:
+            class_name = args[0]
+            command = args[1]
+
+            if class_name in storage_classes:
+                if command == "all()":
+                    self.do_all(class_name)  # <-- This line invokes do_all with the class name
+                    return
+
+        print("*** Unknown syntax:", line)
+
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
