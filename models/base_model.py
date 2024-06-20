@@ -9,7 +9,12 @@ class BaseModel:
     """Represents the parent model for all other models for this project."""
 
     def __init__(self, *args, **kwargs):
-        """Initialize instances of BaseModel."""
+        """Initialize instances of BaseModel.
+
+        Args:
+            *args (any): Unused.
+            **kwargs (dict): Key-value pairs of attributes.
+        """
         if kwargs:
             for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
