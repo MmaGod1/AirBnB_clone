@@ -29,7 +29,8 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all() syntax."""
+        """Custom method dispatcher to handle <class name>.all() and
+        <class name>.count() syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
@@ -38,6 +39,9 @@ class HBNBCommand(cmd.Cmd):
             if class_name in storage_classes:
                 if command == "all()":
                     self.do_all(class_name)
+                    return
+                elif command == "count()":
+                    self.do_count(class_name)
                     return
 
         print("*** Unknown syntax:", line)
@@ -180,6 +184,23 @@ class HBNBCommand(cmd.Cmd):
 
         setattr(obj, attribute_name, attribute_value)
         obj.save()
+
+    def do_count(self, arg):
+        """Usage: count <class> or <class>.count()
+        Retrieve the number of instances of a given class."""
+        args = shlex.split(arg)
+        if not args:
+            print("** class name missing **")
+            return
+
+        class_name = args[0]
+        if class_name not in storage_classes:
+            print("** class doesn't exist **")
+            return
+ 
+        count = sum(1 for obj in storage.all().values()
+                    if obj.__class__.__name__ == class_name)
+        print(count)
 
     def do_EOF(self, arg):
         """Handles EOF (Ctrl+D) signal."""
