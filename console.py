@@ -37,7 +37,7 @@ class HBNBCommand(cmd.Cmd):
 
             if class_name in storage_classes:
                 if command == "all()":
-                    self.do_all(class_name)  # <-- This line invokes do_all with the class name
+                    self.do_all(class_name)
                     return
 
         print("*** Unknown syntax:", line)
