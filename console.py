@@ -31,7 +31,7 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all() and <class name>.count() syntax."""
+        """Custom method dispatcher to handle <class name>.all(), <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>), and <class name>.update(<id>, <attribute_name>, <attribute_value>) syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
@@ -49,6 +49,16 @@ class HBNBCommand(cmd.Cmd):
                                 if obj.__class__.__name__ == class_name)
                     print(count)
                     return
+
+                if command.startswith("show(") and command.endswith(")"):
+                    instance_id = command[5:-1].strip('"\'')
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in storage.all():
+                        print(storage.all()[key])
+                    else:
+                        print("** no instance found **")
+                    return
+
                 if command.startswith("destroy(") and command.endswith(")"):
                     instance_id = command[8:-1].strip('"\'')
                     key = "{}.{}".format(class_name, instance_id)
@@ -58,51 +68,31 @@ class HBNBCommand(cmd.Cmd):
                     else:
                         print("** no instance found **")
                     return
+
                 if command.startswith("update(") and command.endswith(")"):
-                    command_args = shlex.split(command[7:-1].strip('"\''))
-
-                    if len(command_args) < 3:
-                        print("** attribute name or value missing **")
-                        return
-
-                    instance_id = command_args[0]
-                    attribute_name = command_args[1]
-                    attribute_value = command_args[2]
-
                     try:
-                        uuid.UUID(instance_id)
+                        # Properly split and strip quotes from arguments
+                        command_args = shlex.split(command[7:-1])
+                        if len(command_args) < 3:
+                            print("** attribute name or value missing **")
+                            return
+                        instance_id = command_args[0].strip('"\'')
+                        attribute_name = command_args[1].strip('"\'')
+                        attribute_value = command_args[2].strip('"\'')
                     except ValueError:
-                        print("** no instance found **")
+                        print("** attribute name or value missing **")
                         return
 
                     key = "{}.{}".format(class_name, instance_id)
                     if key in storage.all():
                         obj = storage.all()[key]
-
                         setattr(obj, attribute_name, attribute_value)
                         obj.save()
                     else:
                         print("** no instance found **")
                     return
 
-        print("*** Unknown syntax:", line)
-
-    def do_create(self, arg):
-        """Usage: create <class>
-        Creates a new instance of BaseModel, saves
-        it (to the JSON file) and prints the id.
-        """
-        if not arg:
-            print("** class name missing **")
-            return
-
-        if arg not in storage_classes:
-            print("** class doesn't exist **")
-            return
-
-        new_instance = storage_classes[arg]()
-        new_instance.save()
-        print(new_instance.id)
+        print("*** Unknown syntax:", line)1:
 
     def do_show(self, arg):
         """Usage: show <class> <id>
