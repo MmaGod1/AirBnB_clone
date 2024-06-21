@@ -31,6 +31,8 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
+        """Custom method dispatcher to handle <class name>.update(<id>, 
+        <attribute name>, <attribute value>) syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
@@ -40,16 +42,13 @@ class HBNBCommand(cmd.Cmd):
                 if command.startswith("update(") and command.endswith(")"):
                     command_args = shlex.split(command[7:-1].strip('"\''))
 
-                    if len(command_args) < 2:
-                        print("** dictionary representation missing **")
+                    if len(command_args) < 3:
+                        print("** attribute name or value missing **")
                         return
 
                     instance_id = command_args[0]
-                    try:
-                        update_dict = json.loads(command_args[1].replace("'", '"'))
-                    except json.JSONDecodeError:
-                        print("** invalid JSON format **")
-                        return
+                    attribute_name = command_args[1]
+                    attribute_value = command_args[2]
 
                     try:
                         uuid.UUID(instance_id)
@@ -61,8 +60,7 @@ class HBNBCommand(cmd.Cmd):
                     if key in storage.all():
                         obj = storage.all()[key]
 
-                        for key, value in update_dict.items():
-                            setattr(obj, key, value)
+                        setattr(obj, attribute_name, attribute_value)
                         obj.save()
                     else:
                         print("** no instance found **")
