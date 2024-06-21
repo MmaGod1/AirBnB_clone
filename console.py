@@ -2,6 +2,7 @@
 """Defines the HBnB console."""
 import cmd
 import shlex
+import uuid
 from models.base_model import BaseModel
 from models.user import User
 from models import storage
