@@ -61,7 +61,7 @@ class HBNBCommand(cmd.Cmd):
                             if key in storage.all():
                                 obj = storage.all()[key]
                                 for attr, value in attributes.items():
-                                setattr(obj, attr, value)
+                                    setattr(obj, attr, value)
                                 obj.save()
                                 return
                             else:
