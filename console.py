@@ -83,63 +83,23 @@ class HBNBCommand(cmd.Cmd):
 
         obj.save()
 
-    def do_update(self, arg):
-        """Usage: update <class> <id> <attribute_name> <attribute_value>
-                   or update <class> <id> {"attribute1": value1, "attribute2": value2}
-        Updates an instance based on the class name and id by adding or
-        updating attributes (save the change into the JSON file).
+    def do_create(self, arg):
+        """Usage: create <class>
+        Creates a new instance of BaseModel, saves
+        it (to the JSON file) and prints the id.
         """
-        args = shlex.split(arg)
-        if len(args) < 1:
+        if not arg:
             print("** class name missing **")
             return
 
-        class_name = args[0]
-        if class_name not in storage_classes:
+        if arg not in storage_classes:
             print("** class doesn't exist **")
             return
 
-        if len(args) < 2:
-            print("** instance id missing **")
-            return
-
-        instance_id = args[1]
-        key = "{}.{}".format(class_name, instance_id)
-
-        if key not in storage.all():
-            print("** no instance found **")
-            return
-
-        obj = storage.all()[key]
-
-        if len(args) == 3:
-            try:
-                update_dict = eval(args[2])
-                if not isinstance(update_dict, dict):
-                    print("** Invalid update format **")
-                    return
-            except (NameError, SyntaxError):
-                print("** Invalid update format **")
-                return
-
-            for attr, value in update_dict.items():
-                try:
-                    value = eval(value)
-                except (NameError, SyntaxError):
-                    pass
-                setattr(obj, attr, value)
-
-        elif len(args) > 3:
-            attribute_name = args[2]
-            attribute_value = args[3]
-            try:
-                attribute_value = eval(attribute_value)
-            except (NameError, SyntaxError):
-                pass
-            setattr(obj, attribute_name, attribute_value)
-
-        obj.save()
-
+        new_instance = storage_classes[arg]()
+        new_instance.save()
+        print(new_instance.id)
+        
     def do_show(self, arg):
         """Usage: show <class> <id>
         Prints the string representation of an
