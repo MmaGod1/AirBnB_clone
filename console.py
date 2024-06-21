@@ -36,13 +36,16 @@ class HBNBCommand(cmd.Cmd):
         <class name>.destroy(<id>), and
         <class name>.update(<id>, <dictionary representation>) syntax."""
         args = line.split('.')
-        if len(args) > 1:
-            class_name = args[0]
-            command = args[1]
-
+        if ledef def default(self, line):
+            args = line.split('.')
+            if len(args) > 1:
+                class_name = args[0]
+                command = args[1]
+                
             if class_name in storage_classes:
                 if command.startswith("update(") and command.endswith(")"):
                     command_args = shlex.split(command[7:-1].strip('"\''))
+
                     if len(command_args) < 2:
                         print("** dictionary representation missing **")
                         return
@@ -66,10 +69,10 @@ class HBNBCommand(cmd.Cmd):
 
                         for key, value in update_dict.items():
                             setattr(obj, key, value)
-                        obj.save()
+                            obj.save()
                     else:
                         print("** no instance found **")
-                    return
+                        return
 
         print("*** Unknown syntax:", line)
 
