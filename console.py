@@ -3,6 +3,7 @@
 import cmd
 import shlex
 import uuid
+import json
 from models.base_model import BaseModel
 from models.user import User
 from models import storage
@@ -30,8 +31,8 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all(),
-        <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>),
+        """Custom method dispatcher to handle <class name>.all(),.<class name>.count(),
+        <class name>.show(<id>), <class name>.destroy(<id>),
         and <class name>.update(<id>, <dictionary representation>) syntax."""
         args = line.split('.')
         if len(args) > 1:
