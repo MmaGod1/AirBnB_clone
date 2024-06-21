@@ -201,6 +201,10 @@ class HBNBCommand(cmd.Cmd):
         attribute_name = args[2].strip('"\'')
         attribute_value = args[3].strip('"\'')
 
+        if class_name not in storage_classes:
+            print("** class doesn't exist **")
+            return
+
         key = "{}.{}".format(class_name, instance_id)
         if key not in storage.all():
             print("** no instance found **")
