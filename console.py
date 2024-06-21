@@ -30,7 +30,7 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Custom method dispatcher to handle <class name>.all(), <class name>.count(),
-        and <class name>.show(<id>) syntax."""
+        <class name>.show(<id>), and <class name>.destroy(<id>) syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
@@ -46,6 +46,22 @@ class HBNBCommand(cmd.Cmd):
                 elif command.startswith("show(") and command.endswith(")"):
                     instance_id = command[5:-1].strip("()")
                     self.do_show("{} {}".format(class_name, instance_id))
+                    return
+                elif command.startswith("destroy(") and command.endswith(")"):
+                    instance_id = command[8:-1].strip('"\'')
+
+                    try:
+                        uuid.UUID(instance_id)
+                    except ValueError:
+                        print("** no instance found **")
+                        return
+
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in storage.all():
+                        del storage.all()[key]
+                        storage.save()
+                    else:
+                        print("** no instance found **")
                     return
 
         print("*** Unknown syntax:", line)
