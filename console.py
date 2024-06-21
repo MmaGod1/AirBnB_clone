@@ -31,14 +31,20 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.update(<id>, 
-        <attribute name>, <attribute value>) syntax."""
+    def default(self, line):
+        """Custom method dispatcher to handle <class name>.all() syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
             command = args[1]
 
             if class_name in storage_classes:
+                if command == "all()":
+                    all_instances = [str(obj) for key, obj in storage.all().items()
+                                     if key.split('.')[0] == class_name]
+                    print(all_instances)
+                    return
+
                 if command.startswith("update(") and command.endswith(")"):
                     command_args = shlex.split(command[7:-1].strip('"\''))
 
