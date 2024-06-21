@@ -49,15 +49,15 @@ class HBNBCommand(cmd.Cmd):
                                 if obj.__class__.__name__ == class_name)
                     print(count)
                     return
-                if command.startswith("show(") and command.endswith(")"):
-                    instance_id = command[5:-1].strip('"\'')
+                if command.startswith("destroy(") and command.endswith(")"):
+                    instance_id = command[8:-1].strip('"\'')
                     key = "{}.{}".format(class_name, instance_id)
                     if key in storage.all():
-                        print(storage.all()[key])
+                        del storage.all()[key]
+                        storage.save()
                     else:
                         print("** no instance found **")
                     return
-
                 if command.startswith("update(") and command.endswith(")"):
                     command_args = shlex.split(command[7:-1].strip('"\''))
 
