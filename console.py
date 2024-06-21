@@ -176,8 +176,9 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value>
+                   or update <class> <id> {"attribute1": value1, "attribute2": value2}
         Updates an instance based on the class name and id by adding or
-        updating attribute (save the change into the JSON file).
+        updating attributes (save the change into the JSON file).
         """
         args = shlex.split(arg)
         if len(args) < 1:
@@ -200,27 +201,36 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
 
-        if len(args) < 3:
-            print("** attribute name missing **")
-            return
-
-        if len(args) < 4:
-            print("** value missing **")
-            return
-
-        attribute_name = args[2]
-        attribute_value = args[3]
-
         obj = storage.all()[key]
 
-        # Try to convert attribute_value to the correct type
-        try:
-            attribute_value = eval(attribute_value)
-        except (NameError, SyntaxError):
-            pass
+        if len(args) == 3:
+            try:
+                update_dict = eval(args[2])
+                if not isinstance(update_dict, dict):
+                    print("** Invalid update format **")
+                    return
+            except (NameError, SyntaxError):
+                print("** Invalid update format **")
+                return
 
-        setattr(obj, attribute_name, attribute_value)
+            for attr, value in update_dict.items():
+                try:
+                    value = eval(value)
+                except (NameError, SyntaxError):
+                    pass
+                setattr(obj, attr, value)
+
+        elif len(args) > 3:
+            attribute_name = args[2]
+            attribute_value = args[3]
+            try:
+                attribute_value = eval(attribute_value)
+            except (NameError, SyntaxError):
+                pass
+            setattr(obj, attribute_name, attribute_value)
+
         obj.save()
+
 
     def do_count(self, arg):
         """Usage: count <class> or <class>.count()
