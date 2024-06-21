@@ -31,42 +31,46 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.update(<id>, 
-        <attribute name>, <attribute value>) syntax."""
-        args = line.split('.')
-        if len(args) > 1:
+        """Custom method dispatcher to handle <class name>.update(<id>, <attribute name>, <attribute value>) syntax."""
+        args = line.split('.', 1)
+        if len(args) == 2:
             class_name = args[0]
-            command = args[1]
-
             if class_name in storage_classes:
+                command = args[1].strip()
                 if command.startswith("update(") and command.endswith(")"):
-                    command_args = shlex.split(command[7:-1].strip('"\''))
-
-                    if len(command_args) < 3:
+                    params = command[7:-1].split(", ", 2)
+                    if len(params) == 3:
+                        instance_id = params[0].strip('"')
+                        attribute_name = params[1].strip('"')
+                        attribute_value = params[2].strip('"')
+ 
+                        key = f"{class_name}.{instance_id}"
+                        if key in storage.all():
+                            obj = storage.all()[key]
+                        
+                            # Try to convert attribute_value to the correct type
+                            try:
+                                attribute_value = eval(attribute_value)
+                            except (NameError, SyntaxError):
+                                pass
+                        
+                            setattr(obj, attribute_name, attribute_value)
+                            obj.save()
+                            return
+                        else:
+                            print("** no instance found **")
+                            return
+                    else:
                         print("** attribute name or value missing **")
                         return
-
-                    instance_id = command_args[0]
-                    attribute_name = command_args[1]
-                    attribute_value = command_args[2]
-
-                    try:
-                        uuid.UUID(instance_id)
-                    except ValueError:
-                        print("** no instance found **")
-                        return
-
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in storage.all():
-                        obj = storage.all()[key]
-
-                        setattr(obj, attribute_name, attribute_value)
-                        obj.save()
-                    else:
-                        print("** no instance found **")
+                else:
+                    print("*** Unknown syntax:", line)
                     return
-
-        print("*** Unknown syntax:", line)
+            else:
+                print("** class doesn't exist **")
+                return
+        else:
+            print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
         """Usage: create <class>
