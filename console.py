@@ -31,8 +31,8 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all(),.<class name>.count(),
-        <class name>.show(<id>), <class name>.destroy(<id>),
+        """Custom method dispatcher to handle <class name>.all(),
+        <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>),
         and <class name>.update(<id>, <dictionary representation>) syntax."""
         args = line.split('.')
         if len(args) > 1:
@@ -41,6 +41,7 @@ class HBNBCommand(cmd.Cmd):
 
             if class_name in storage_classes:
                 if command.startswith("update(") and command.endswith(")"):
+                    # Extract arguments from the update command
                     command_args = shlex.split(command[7:-1].strip('"\''))
 
                     if len(command_args) < 2:
@@ -50,7 +51,7 @@ class HBNBCommand(cmd.Cmd):
                     instance_id = command_args[0]
                     try:
                         # Parse the dictionary representation
-                        update_dict = json.loads(command_args[1])
+                        update_dict = json.loads(command_args[1].replace("'", '"'))
                     except json.JSONDecodeError:
                         print("** invalid JSON format **")
                         return
@@ -75,7 +76,6 @@ class HBNBCommand(cmd.Cmd):
                     return
 
         print("*** Unknown syntax:", line)
-
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
