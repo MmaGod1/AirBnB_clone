@@ -77,23 +77,18 @@ class HBNBCommand(cmd.Cmd):
                     instance_id = command_args[0]
                     attribute_name = command_args[1]
                     attribute_value = command_args[2]
-
-                    try:
-                        uuid.UUID(instance_id)
-                    except ValueError:
-                        print("** no instance found **")
-                        return
-
                     key = "{}.{}".format(class_name, instance_id)
                     if key in storage.all():
                         obj = storage.all()[key]
-
-                        setattr(obj, attribute_name, attribute_value)
-                        obj.save()
-                    else:
-                        print("** no instance found **")
-                    return
-
+                    try:
+                        attribute_value = eval(attribute_value)
+                    except (NameError, SyntaxError):
+                        pass
+                    setattr(obj, attribute_name, attribute_value)
+                    obj.save()
+                else:
+                    print("** no instance found **")
+                return
         print("*** Unknown syntax:", line)
     def do_create(self, arg):
         """Usage: create <class>
