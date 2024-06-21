@@ -61,7 +61,11 @@ class HBNBCommand(cmd.Cmd):
                             if key in storage.all():
                                 obj = storage.all()[key]
                                 for attr, value in attributes.items():
-                                    setattr(obj, attr, value)
+                                    if hasattr(obj, attr):
+                                        setattr(obj, attr, value)
+                                    else:
+                                        print(f"FAIL: model doesn't have attribute '{attr}'")
+                                        return
                                 obj.save()
                                 return
                             else:
@@ -88,8 +92,11 @@ class HBNBCommand(cmd.Cmd):
                                 except (NameError, SyntaxError):
                                     pass
   
-                                setattr(obj, attribute_name, attribute_value)
-                                obj.save()
+                                if hasattr(obj, attribute_name):
+                                    setattr(obj, attribute_name, attribute_value)
+                                    obj.save()
+                                else:
+                                    print(f"FAIL: model doesn't have attribute '{attribute_name}'")
                                 return
                             else:
                                 print("** no instance found **")
