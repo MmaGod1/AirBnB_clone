@@ -191,19 +191,15 @@ class HBNBCommand(cmd.Cmd):
         Updates an instance based on the class name, instance ID, attribute name,
         and attribute value. Saves the change into the JSON file.
         """
-        command_args = shlex.split(arg)
-        if len(command_args) < 4:
+        args = shlex.split(arg)
+        if len(args) < 4:
             print("** syntax error **")
             return
 
-        class_name = command_args[0]
-        if class_name not in storage_classes:
-            print("** class doesn't exist **")
-            return
-
-        instance_id = command_args[1]
-        attribute_name = command_args[2]
-        attribute_value = command_args[3]
+        class_name = args[0]
+        instance_id = args[1].strip('"\'')
+        attribute_name = args[2].strip('"\'')
+        attribute_value = args[3].strip('"\'')
 
         key = "{}.{}".format(class_name, instance_id)
         if key not in storage.all():
@@ -211,14 +207,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         obj = storage.all()[key]
-
-        # Update the attribute
         setattr(obj, attribute_name, attribute_value)
-
-        # Update the updated_at timestamp
-        obj.updated_at = datetime.datetime.now()
-
-        # Save the changes
         obj.save()
 
     def do_count(self, arg):
