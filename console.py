@@ -58,6 +58,15 @@ class HBNBCommand(cmd.Cmd):
                         print("** no instance found **")
                     return
 
+                if command.startswith("destroy(") and command.endswith(")"):
+                    instance_id = command[8:-1].strip('"\'')
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in storage.all():
+                        del storage.all()[key]
+                        storage.save()
+                    else:
+                        print("** no instance found **")
+                    return
                 if command.startswith("update(") and command.endswith(")"):
                     command_args = shlex.split(command[7:-1].strip('"\''))
 
