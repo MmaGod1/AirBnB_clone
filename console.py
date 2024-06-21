@@ -115,7 +115,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value>
-            or update <class> <id> {"attribute1": value1, "attribute2": value2}
+                   or update <class> <id> {"attribute1": value1, "attribute2": value2}
         Updates an instance based on the class name and id by adding or
         updating attributes (save the change into the JSON file).
         """
@@ -140,13 +140,11 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
 
-        # Check for dictionary update or attribute update
-        if len(args) == 2:
-        # Expecting dictionary in next command
-            print("** Waiting for update dictionary...**")
-            next_line = input()
+        obj = storage.all()[key]
+
+        if len(args) == 3:
             try:
-                update_dict = eval(next_line.strip())
+                update_dict = eval(args[2])
                 if not isinstance(update_dict, dict):
                     print("** Invalid update format **")
                     return
@@ -154,27 +152,21 @@ class HBNBCommand(cmd.Cmd):
                 print("** Invalid update format **")
                 return
 
-        elif len(args) > 2:
-            # Regular attribute update
-            if len(args) < 4:
-                print("** attribute name or value missing **")
-                return
+            for attr, value in update_dict.items():
+                try:
+                    value = eval(value)
+                except (NameError, SyntaxError):
+                    pass
+                setattr(obj, attr, value)
+
+        elif len(args) > 3:
             attribute_name = args[2]
             attribute_value = args[3]
-            update_dict = {attribute_name: attribute_value}  # Convert to dictionary
-
-        else:
-            print("** Invalid update syntax **")
-            return
-
-        obj = storage.all()[key]
-
-        # Update attributes in the object
-        for attr, value in update_dict.items():
-            if not hasattr(obj, attr):
-                print(f"FAIL: model doesn't have attribute '{attr}'")
-                continue
-            setattr(obj, attr, value)
+            try:
+                attribute_value = eval(attribute_value)
+            except (NameError, SyntaxError):
+                pass
+            setattr(obj, attribute_name, attribute_value)
 
         obj.save()
 
