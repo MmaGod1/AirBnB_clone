@@ -32,23 +32,23 @@ class HBNBCommand(cmd.Cmd):
         """Custom method dispatcher to handle <class name>.all(),
         <class name>.count(), and <class name>.show(<id>) syntax."""
         args = line.split('.')
-    if len(args) > 1:
-        class_name = args[0]
-        command = args[1]
+        if len(args) > 1:
+            class_name = args[0]
+            command = args[1]
 
-        if class_name in storage_classes:
-            if command == "all()":
-                self.do_all(class_name)
-                return
-            elif command == "count()":
-                self.do_count(class_name)
-                return
-            elif command.startswith("show(") and command.endswith(")"):
-                instance_id = command[5:-1]
-                self.do_show("{} {}".format(class_name, instance_id))
-                return
+            if class_name in storage_classes:
+                if command == "all()":
+                    self.do_all(class_name)
+                    return
+                elif command == "count()":
+                    self.do_count(class_name)
+                    return
+                elif command.startswith("show(") and command.endswith(")"):
+                    instance_id = command[5:-1]
+                    self.do_show("{} {}".format(class_name, instance_id))
+                    return
 
-    print("*** Unknown syntax:", line))
+        print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
         """Usage: create <class>
