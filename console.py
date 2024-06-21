@@ -31,7 +31,6 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-    def default(self, line):
         """Custom method dispatcher to handle <class name>.all() syntax."""
         args = line.split('.')
         if len(args) > 1:
