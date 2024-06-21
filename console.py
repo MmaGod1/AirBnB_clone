@@ -31,16 +31,30 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Custom method dispatcher to handle <class name>.all(),
-        <class name>.count(),.<class name>.show(<id>),
-        and <class name>.destroy(<id>) syntax."""
+        <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>),
+        and <class name>.update(<id>, <dictionary representation>) syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
             command = args[1]
 
             if class_name in storage_classes:
-                if command.startswith("destroy(") and command.endswith(")"):
-                    instance_id = command[8:-1].strip('"\'') 
+                if command.startswith("update(") and command.endswith(")"):
+                    command_args = shlex.split(command[7:-1].strip('"\''))
+
+                    if len(command_args) < 2:
+                        print("** dictionary representation missing **")
+                        return
+
+                    instance_id = command_args[0]
+                    try:
+                        # Parse the dictionary representation
+                        update_dict = json.loads(command_args[1])
+                    except json.JSONDecodeError:
+                        print("** invalid JSON format **")
+                        return
+
+                    # Validate if instance_id is a valid UUID
                     try:
                         uuid.UUID(instance_id)
                     except ValueError:
@@ -49,8 +63,12 @@ class HBNBCommand(cmd.Cmd):
 
                     key = "{}.{}".format(class_name, instance_id)
                     if key in storage.all():
-                        del storage.all()[key]
-                        storage.save()
+                        obj = storage.all()[key]
+
+                        # Update attributes from dictionary representation
+                        for key, value in update_dict.items():
+                            setattr(obj, key, value)
+                        obj.save()
                     else:
                         print("** no instance found **")
                     return
