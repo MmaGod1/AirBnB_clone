@@ -113,22 +113,70 @@ class HBNBCommand(cmd.Cmd):
         else:
             print("*** Unknown syntax:", line)
 
-    def do_create(self, arg):
-        """Usage: create <class>
-        Creates a new instance of BaseModel, saves
-        it (to the JSON file) and prints the id.
+    def do_update(self, arg):
+        """Usage: update <class> <id> <attribute_name> <attribute_value>
+            or update <class> <id> {"attribute1": value1, "attribute2": value2}
+        Updates an instance based on the class name and id by adding or
+        updating attributes (save the change into the JSON file).
         """
-        if not arg:
+        args = shlex.split(arg)
+        if len(args) < 1:
             print("** class name missing **")
             return
 
-        if arg not in storage_classes:
+        class_name = args[0]
+        if class_name not in storage_classes:
             print("** class doesn't exist **")
             return
 
-        new_instance = storage_classes[arg]()
-        new_instance.save()
-        print(new_instance.id)
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+
+        instance_id = args[1]
+        key = "{}.{}".format(class_name, instance_id)
+
+        if key not in storage.all():
+            print("** no instance found **")
+            return
+
+        # Check for dictionary update or attribute update
+        if len(args) == 2:
+        # Expecting dictionary in next command
+            print("** Waiting for update dictionary...**")
+            next_line = input()
+            try:
+                update_dict = eval(next_line.strip())
+                if not isinstance(update_dict, dict):
+                    print("** Invalid update format **")
+                    return
+            except (NameError, SyntaxError):
+                print("** Invalid update format **")
+                return
+
+        elif len(args) > 2:
+            # Regular attribute update
+            if len(args) < 4:
+                print("** attribute name or value missing **")
+                return
+            attribute_name = args[2]
+            attribute_value = args[3]
+            update_dict = {attribute_name: attribute_value}  # Convert to dictionary
+
+        else:
+            print("** Invalid update syntax **")
+            return
+
+        obj = storage.all()[key]
+
+        # Update attributes in the object
+        for attr, value in update_dict.items():
+            if not hasattr(obj, attr):
+                print(f"FAIL: model doesn't have attribute '{attr}'")
+                continue
+            setattr(obj, attr, value)
+
+        obj.save()
 
     def do_show(self, arg):
         """Usage: show <class> <id>
