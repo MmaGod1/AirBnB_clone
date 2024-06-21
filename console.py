@@ -68,31 +68,33 @@ class HBNBCommand(cmd.Cmd):
                         print("** no instance found **")
                     return
                 if command.startswith("update(") and command.endswith(")"):
-                    try:
-                        command_args = shlex.split(command[7:-1].strip('"\''))
-                        if len(command_args) < 3:
-                            print("** attribute name or value missing **")
-                            return
+                    command_args = shlex.split(command[7:-1].strip('"\''))
 
-                        instance_id = command_args[0]
-                        attribute_name = command_args[1]
-                        attribute_value = command_args[2]
-                        key = "{}.{}".format(class_name, instance_id)
-                        if key in storage.all():
-                            obj = storage.all()[key]
-                            try:
-                                attribute_value = eval(attribute_value)
-                            except (NameError, SyntaxError):
-                                pass
-                            setattr(obj, attribute_name, attribute_value)
-                            obj.save()
-                        else:
-                            print("** no instance found **")
-                    except ValueError:
+                    if len(command_args) < 3:
                         print("** attribute name or value missing **")
+                        return
+
+                    instance_id = command_args[0]
+                    attribute_name = command_args[1]
+                    attribute_value = command_args[2]
+
+                    try:
+                        uuid.UUID(instance_id)
+                    except ValueError:
+                        print("** no instance found **")
+                        return
+
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in storage.all():
+                        obj = storage.all()[key]
+
+                        setattr(obj, attribute_name, attribute_value)
+                        obj.save()
+                    else:
+                        print("** no instance found **")
                     return
+
         print("*** Unknown syntax:", line)
-        
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
