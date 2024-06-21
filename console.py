@@ -187,26 +187,50 @@ class HBNBCommand(cmd.Cmd):
             print(all_instances)
 
     def do_update(self, arg):
-        """Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
-        Updates an instance based on the class name, instance ID, attribute name,
-        and attribute value. Saves the change into the JSON file.
+        """Usage: update <class> <id> <attribute_name> <attribute_value>
+        Updates an instance based on the class name and id by adding or
+        updating attribute (save the change into the JSON file).
         """
         args = shlex.split(arg)
-        if len(args) < 4:
-            print("** syntax error **")
+        if len(args) < 1:
+            print("** class name missing **")
             return
 
         class_name = args[0]
-        instance_id = args[1].strip('"\'')
-        attribute_name = args[2].strip('"\'')
-        attribute_value = args[3].strip('"\'')
+        if class_name not in storage_classes:
+            print("** class doesn't exist **")
+            return
 
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+
+        instance_id = args[1]
         key = "{}.{}".format(class_name, instance_id)
+
         if key not in storage.all():
             print("** no instance found **")
             return
 
+        if len(args) < 3:
+            print("** attribute name missing **")
+            return
+
+        if len(args) < 4:
+            print("** value missing **")
+            return
+
+        attribute_name = args[2]
+        attribute_value = args[3]
+
         obj = storage.all()[key]
+
+        # Try to convert attribute_value to the correct type
+        try:
+            attribute_value = eval(attribute_value)
+        except (NameError, SyntaxError):
+            pass
+
         setattr(obj, attribute_name, attribute_value)
         obj.save()
 
