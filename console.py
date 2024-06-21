@@ -29,8 +29,9 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all(), <class name>.count(),
-        <class name>.show(<id>), and <class name>.destroy(<id>) syntax."""
+        """Custom method dispatcher to handle <class name>.all(),
+        <class name>.count(), <class name>.show(<id>),
+        and <class name>.destroy(<id>) syntax."""
         args = line.split('.')
         if len(args) > 1:
             class_name = args[0]
@@ -65,6 +66,7 @@ class HBNBCommand(cmd.Cmd):
                     return
 
         print("*** Unknown syntax:", line)
+
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
