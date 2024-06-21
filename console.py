@@ -30,7 +30,7 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Custom method dispatcher to handle <class name>.all(),
-        <class name>.count(), <class name>.show(<id>),
+        <class name>.count(),.<class name>.show(<id>),
         and <class name>.destroy(<id>) syntax."""
         args = line.split('.')
         if len(args) > 1:
@@ -38,19 +38,8 @@ class HBNBCommand(cmd.Cmd):
             command = args[1]
 
             if class_name in storage_classes:
-                if command == "all()":
-                    self.do_all(class_name)
-                    return
-                elif command == "count()":
-                    self.do_count(class_name)
-                    return
-                elif command.startswith("show(") and command.endswith(")"):
-                    instance_id = command[5:-1].strip("()")
-                    self.do_show("{} {}".format(class_name, instance_id))
-                    return
-                elif command.startswith("destroy(") and command.endswith(")"):
-                    instance_id = command[8:-1].strip('"\'')
-
+                if command.startswith("destroy(") and command.endswith(")"):
+                    instance_id = command[8:-1].strip('"\'') 
                     try:
                         uuid.UUID(instance_id)
                     except ValueError:
