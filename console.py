@@ -32,86 +32,41 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Custom method dispatcher to handle <class name>.update(<id>, 
-        <attribute name>, <attribute value>) and <class name>.update(<id>, 
-        <dictionary>) syntax."""
-        args = line.split('.', 1)
-        if len(args) == 2:
+        <attribute name>, <attribute value>) syntax."""
+        args = line.split('.')
+        if len(args) > 1:
             class_name = args[0]
-            if class_name in storage_classes:
-                command = args[1].strip()
-                if command.startswith("update(") and command.endswith(")"):
-                    params = command[7:-1].strip()
-                
-                    if params.startswith("{") and params.endswith("}"):
-                        # Handle dictionary update
-                        try:
-                            id_and_dict = params.split(", ", 1)
-                            if len(id_and_dict) != 2:
-                                print("** attribute name or value missing **")
-                                return
-                        
-                            instance_id = id_and_dict[0].strip('"')
-                            attributes = eval(id_and_dict[1])
-                        
-                            if not isinstance(attributes, dict):
-                                print("** attribute name or value missing **")
-                                return
+            command = args[1]
 
-                            key = f"{class_name}.{instance_id}"
-                            if key in storage.all():
-                                obj = storage.all()[key]
-                                for attr, value in attributes.items():
-                                    if hasattr(obj, attr):
-                                        setattr(obj, attr, value)
-                                    else:
-                                        print(f"FAIL: model doesn't have attribute '{attr}'")
-                                        return
-                                obj.save()
-                                return
-                            else:
-                                print("** no instance found **")
-                                return
-                        except Exception as e:
-                            print(f"** error: {e} **")
-                            return
+            if class_name in storage_classes:
+                if command.startswith("update(") and command.endswith(")"):
+                    command_args = shlex.split(command[7:-1].strip('"\''))
+
+                    if len(command_args) < 3:
+                        print("** attribute name or value missing **")
+                        return
+
+                    instance_id = command_args[0]
+                    attribute_name = command_args[1]
+                    attribute_value = command_args[2]
+
+                    try:
+                        uuid.UUID(instance_id)
+                    except ValueError:
+                        print("** no instance found **")
+                        return
+
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in storage.all():
+                        obj = storage.all()[key]
+
+                        setattr(obj, attribute_name, attribute_value)
+                        obj.save()
                     else:
-                        # Handle regular update
-                        params = params.split(", ", 2)
-                        if len(params) == 3:
-                            instance_id = params[0].strip('"')
-                            attribute_name = params[1].strip('"')
-                            attribute_value = params[2].strip('"')
-                        
-                            key = f"{class_name}.{instance_id}"
-                            if key in storage.all():
-                                obj = storage.all()[key]
-                            
-                                # Try to convert attribute_value to the correct type
-                                try:
-                                    attribute_value = eval(attribute_value)
-                                except (NameError, SyntaxError):
-                                    pass
-  
-                                if hasattr(obj, attribute_name):
-                                    setattr(obj, attribute_name, attribute_value)
-                                    obj.save()
-                                else:
-                                    print(f"FAIL: model doesn't have attribute '{attribute_name}'")
-                                return
-                            else:
-                                print("** no instance found **")
-                                return
-                        else:
-                            print("** attribute name or value missing **")
-                            return
-                else:
-                    print("*** Unknown syntax:", line)
+                        print("** no instance found **")
                     return
-            else:
-                print("** class doesn't exist **")
-                return
-        else:
-            print("*** Unknown syntax:", line)
+
+        print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
         """Usage: create <class>
