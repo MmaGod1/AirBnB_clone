@@ -92,6 +92,7 @@ class HBNBCommand(cmd.Cmd):
                         print("** attribute name or value missing **")
                     return
         print("*** Unknown syntax:", line)
+        
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
