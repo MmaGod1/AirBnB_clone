@@ -68,11 +68,7 @@ class HBNBCommand(cmd.Cmd):
                         print("** no instance found **")
                     return
                 if command.startswith("update(") and command.endswith(")"):
-                    try:
-                        command_args = shlex.split(command[7:-1])
-                    except ValueError:
-                        print("** invalid command format **")
-                        return
+                    command_args = shlex.split(command[7:-1].strip('"\''))
 
                     if len(command_args) < 3:
                         print("** attribute name or value missing **")
@@ -82,15 +78,15 @@ class HBNBCommand(cmd.Cmd):
                     attribute_name = command_args[1]
                     attribute_value = command_args[2]
 
+                    try:
+                        uuid.UUID(instance_id)
+                    except ValueError:
+                        print("** no instance found **")
+                        return
+
                     key = "{}.{}".format(class_name, instance_id)
                     if key in storage.all():
                         obj = storage.all()[key]
-
-                        # Try to convert attribute_value to the correct type
-                        try:
-                            attribute_value = eval(attribute_value)
-                        except (NameError, SyntaxError):
-                            pass
 
                         setattr(obj, attribute_name, attribute_value)
                         obj.save()
