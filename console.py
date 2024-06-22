@@ -70,31 +70,30 @@ class HBNBCommand(cmd.Cmd):
 
                 if command.startswith("update(") and command.endswith(")"):
                     command_content = command[7:-1]
+                    command_args = [arg.strip(',') for arg in shlex.split(command_content)]
+                    if len(command_args) == 1:
+                        instance_id = command_args[0].strip('"\'')
+                        if instance_id.startswith('{') and instance_id.endswith('}'):
+                            try:
+                                update_dict = json.loads(instance_id)
+                                self.do_update(f"{class_name} {command_args[0]} {json.dumps(update_dict)}")
+                            except json.JSONDecodeError:
+                                print("** invalid JSON format **")
+                                return
 
-                    idex_pos = command_content.find(',')
-                    instance_id = command_content[:idex_pos].strip('"\'')
-                    dict_repr = command_content[idex_pos+1:].strip()
-                    try:
-                        dict_representation = json.loads(dict_repr)
-                    except json.JSONDecodeError:
-                        print("** Invalid JSON format for dictionary representation **")
+                        else:
+                            print("** attribute name or value missing **")
                         return
-                    print(f"Instance ID: {instance_id}, Dictionary: {dict_representation}")
-                    arg = f"{class_name} {instance_id}"
-                    self.do_update(arg)
-                    return
-                """
                     if len(command_args) < 3:
                         print("** attribute name or value missing **")
                         return
-
                     instance_id = command_args[0].strip('"\'')
                     attribute_name = command_args[1].strip('"\'')
                     attribute_value = command_args[2].strip('"\'')
                     self.do_update(f"{class_name} {instance_id} {attribute_name} {attribute_value}")
-                    return"""
-
-        print("*** Unknown syntax:", line)
+                    
+                    return
+            print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
         """Usage: create <class>
