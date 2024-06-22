@@ -32,13 +32,10 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line):
         """Custom method dispatcher to handle <class name>.all() and <class name>.count() syntax."""
-        print(f"Received command: {line}")
         args = line.split('.')
         if len(args) > 1:
-            print(f"Parsed args: {args}")
             class_name = args[0]
             command = args[1]
-            print(f"Class name: {class_name}, Command: {command}")
 
             if class_name in storage_classes:
                 if command == "all()":
@@ -73,28 +70,16 @@ class HBNBCommand(cmd.Cmd):
 
                 if command.startswith("update(") and command.endswith(")"):
                     command_content = command[7:-1]
-                    print(f"Command content: {command_content}")
                     command_args = [arg.strip(',') for arg in shlex.split(command_content)]
-                    print(f"Command arguments: {command_args}")
                     if len(command_args) < 3:
                         print("** attribute name or value missing **")
                         return
 
-                    instance_id = command_args[0]
-                    attribute_name = command_args[1]
-                    attribute_value = command_args[2]
-                    try:
-                        uuid.UUID(instance_id)
-                    except ValueError:
-                        print("** no instance found **")
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in storage.all():
-                        obj = storage.all()[key]
-                        setattr(obj, attribute_name, attribute_value)
-                        obj.save()
-                    else:
-                        print("** no instance found **")
-                        return
+                    instance_id = command_args[0].strip('"\'')
+                    attribute_name = command_args[1].strip('"\'')
+                    attribute_value = command_args[2].strip('"\'')
+                    self.do_update(f"{class_name} {instance_id} {attribute_name} {attribute_value}")
+                    return
         print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
