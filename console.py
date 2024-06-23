@@ -251,6 +251,10 @@ class HBNBCommand(cmd.Cmd):
                     if obj.__class__.__name__ == class_name)
         print(count)
 
+    def emptyline(self):
+        """Override default `empty line + return` behaviour."""
+        pass
+
     def do_EOF(self, arg):
         """Handles EOF (Ctrl+D) signal."""
         print("")
