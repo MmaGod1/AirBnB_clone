@@ -69,42 +69,30 @@ class HBNBCommand(cmd.Cmd):
                     return
 
                 if command.startswith("update(") and command.endswith(")"):
-                    try:
-                        command_content = command[7:-1]
-                        instance_id, update_content = shlex.split(command_content, maxsplit=1)
-                        instance_id = instance_id.strip('"\'')
-                        key = "{}.{}".format(class_name, instance_id)
-                        if key not in storage.all():
-                            print("** no instance found **")
-                            return
-
-                        obj = storage.all()[key]
-                        if update_content.startswith("{") and update_content.endswith("}"):
-                            updates = json.loads(update_content)
-                            if isinstance(updates, dict):
-                                for attr, val in updates.items():
-                                    setattr(obj, attr, val)
-                                    obj.save()
-                                    return
-                            else:
-                                print("** value is not a dictionary **")
-                                return
-                        else:
-                            update_args = shlex.split(update_content)
-                            if len(update_args) != 2:
-                                print("** attribute name or value missing **")
-                                return
-                            attribute_name, attribute_value = update_args
+                    command_content = command[7:-1]
+                    command_args = [arg.strip(',') for arg in shlex.split(command_content)]
+                    if len(command_args) == 1:
+                        instance_id = command_args[0].strip('"\'')
+                        if instance_id.startswith('{') and instance_id.endswith('}'):
                             try:
-                                attribute_value = eval(attribute_value)
-                            except (NameError, SyntaxError):
-                                pass
-                            setattr(obj, attribute_name, attribute_value)
-                            obj.save()
-                            return
-                    except ValueError:
+                                update_dict = json.loads(instance_id)
+                                self.do_update(f"{class_name} {command_args[0]} {json.dumps(update_dict)}")
+                            except json.JSONDecodeError:
+                                print("** invalid JSON format **")
+                                return
+
+                        else:
+                            print("** attribute name or value missing **")
+                        return
+                    if len(command_args) < 3:
                         print("** attribute name or value missing **")
                         return
+                    instance_id = command_args[0].strip('"\'')
+                    attribute_name = command_args[1].strip('"\'')
+                    attribute_value = command_args[2].strip('"\'')
+                    self.do_update(f"{class_name} {instance_id} {attribute_name} {attribute_value}")
+                    
+                    return
             print("*** Unknown syntax:", line)
 
     def do_create(self, arg):
@@ -224,22 +212,6 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
 
-        obj = storage.all()[key]
-        if len(args) == 3:
-            try:
-                updates = json.loads(args[2])
-                if isinstance(updates, dict):
-                    for attr, val in updates.items():
-                        setattr(obj, attr, val)
-                        obj.save()
-                        return
-                else:
-                    print("** value is not a dictionary **")
-                    return
-            except json.JSONDecodeError:
-                print("** invalid JSON format **")
-                return
-
         if len(args) < 3:
             print("** attribute name missing **")
             return
@@ -250,6 +222,8 @@ class HBNBCommand(cmd.Cmd):
 
         attribute_name = args[2]
         attribute_value = args[3]
+
+        obj = storage.all()[key]
 
         # Try to convert attribute_value to the correct type
         try:
