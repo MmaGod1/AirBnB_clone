@@ -76,8 +76,8 @@ class HBNBCommand(cmd.Cmd):
                                     for arg in shlex.split(command_content)]
                     if len(command_args) == 1:
                         instance_id = command_args[0].strip('"\'')
-                        if instance_id.startswith('{')
-                        and instance_id.endswith('}'):
+                        if (instance_id.startswith('{') and
+                                instance_id.endswith('}')):
                             try:
                                 update_dict = json.loads(instance_id)
                                 self.do_update(f"{class_name} {command_args[0]}
