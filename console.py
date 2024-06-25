@@ -34,72 +34,66 @@ class HBNBCommand(cmd.Cmd):
         """Custom method dispatcher to handle <class name>.all() and
         <class name>.count() syntax."""
         args = line.split('.')
-        if len(args) > 1:
-            class_name = args[0]
-            command = args[1]
+        if len(args) < 2:
+            print("*** Unknown syntax: {}".format(line))
+            return
+        class_name, command = args[0], args[1]
+        if class_name not in storage_classes:
+            print("** class doesn't exist **")
+            return
+        command_parts = command.split('(')
+        if len(command_parts) < 2:
+            print("*** Unknown syntax: {}".format(line))
+            return
+        command_name = command_parts[0]
+        command_content = command_parts[1].strip(')')
 
-            if class_name in storage_classes:
-                if command == "all()":
-                    all_instances = [str(obj)
-                                     for key, obj in storage.all().items()
-                                     if key.split('.')[0] == class_name]
-                    print(all_instances)
-                    return
+        if command_name == "all":
+            all_instances = [str(obj) for key, obj in storage.all().items()
+                             if key.split('.')[0] == class_name]
+            print(all_instances)
+            return
 
-                if command == "count()":
-                    count = sum(1 for obj in storage.all().values()
-                                if obj.__class__.__name__ == class_name)
-                    print(count)
-                    return
-                if command.startswith("show(") and command.endswith(")"):
-                    instance_id = command[5:-1].strip('"\'')
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in storage.all():
-                        print(storage.all()[key])
-                    else:
-                        print("** no instance found **")
-                    return
+        if command_name == "count":
+            count = sum(1 for obj in storage.all().values()
+                        if obj.__class__.__name__ == class_name)
+            print(count)
+            return
 
-                if command.startswith("destroy(") and command.endswith(")"):
-                    instance_id = command[8:-1].strip('"\'')
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in storage.all():
-                        del storage.all()[key]
-                        storage.save()
-                    else:
-                        print("** no instance found **")
-                    return
+        if command_name == "show":
+            instance_id = command_content.strip('"\'')
+            key = "{}.{}".format(class_name, instance_id)
+            if key in storage.all():
+                del storage.all()[key]
+                storage.save()
+            else:
+                print("** no instance found **")
+                return
 
-                if command.startswith("update(") and command.endswith(")"):
-                    command_content = command[7:-1]
-                    command_args = [arg.strip(',')
-                                    for arg in shlex.split(command_content)]
-                    if len(command_args) == 1:
-                        instance_id = command_args[0].strip('"\'')
-                        if (instance_id.startswith('{') and
-                                instance_id.endswith('}')):
-                            try:
-                                update_dict = json.loads(instance_id)
-                                self.do_update(f"{class_name}\
-                                        {command_args[0]}\
-                                        {json.dumps(update_dict)}")
-                            except json.JSONDecodeError:
-                                print("** invalid JSON format **")
-                                return
-
-                        else:
-                            print("** attribute name or value missing **")
+            if command_name == "update":
+                command_args = shlex.split(command_content)
+                if len(command_args) == 2:
+                    instance_id = command_args[0].strip('"\'')
+                    try:
+                        update_dict = json.loads(command_args[1])
+                        for key, value in update_dict.items():
+                            self.do_update(f"{class_name} {instance_id}\
+                                    {key} {value}")
+                    except json.JSONDecodeError:
+                        print("** invalid JSON format **")
                         return
                     if len(command_args) < 3:
                         print("** attribute name or value missing **")
                         return
+
                     instance_id = command_args[0].strip('"\'')
                     attribute_name = command_args[1].strip('"\'')
                     attribute_value = command_args[2].strip('"\'')
                     self.do_update(f"{class_name} {instance_id}\
-                                   {attribute_name} {attribute_value}")
+                            {attribute_name} {attribute_value}")
                     return
-            print("*** Unknown syntax:", line)
+
+                print("*** Unknown syntax: {}".format(line))
 
     def do_create(self, arg):
         """Usage: create <class>
@@ -218,11 +212,13 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
 
-        if len(args) == 3 and args[2].startswith('{') and args[2].endswith('}'):
+        if len(args) == 3 and args[2].startswith('{') and
+        args[2].endswith('}'):
             try:
                 attribute_dict = eval(args[2])
                 for attribute_name, attribute_value in attribute_dict.items():
-                    setattr(storage.all()[key], attribute_name, attribute_value)
+                    setattr(storage.all()[key], attribute_name,
+                            attribute_value)
                 storage.all()[key].save()
                 return
             except (SyntaxError, ValueError):
@@ -241,7 +237,6 @@ class HBNBCommand(cmd.Cmd):
                 pass
             setattr(obj, attribute_name, attribute_value)
             obj.save()
-
 
     def do_count(self, arg):
         """Usage: count <class> or <class>.count()
