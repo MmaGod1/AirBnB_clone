@@ -80,8 +80,9 @@ class HBNBCommand(cmd.Cmd):
                                 instance_id.endswith('}')):
                             try:
                                 update_dict = json.loads(instance_id)
-                                self.do_update(f"{class_name} {command_args[0]}
-                                               {json.dumps(update_dict)}")
+                                self.do_update(f"{class_name}\
+                                        {command_args[0]}\
+                                        {json.dumps(update_dict)}")
                             except json.JSONDecodeError:
                                 print("** invalid JSON format **")
                                 return
@@ -95,7 +96,7 @@ class HBNBCommand(cmd.Cmd):
                     instance_id = command_args[0].strip('"\'')
                     attribute_name = command_args[1].strip('"\'')
                     attribute_value = command_args[2].strip('"\'')
-                    self.do_update(f"{class_name} {instance_id}
+                    self.do_update(f"{class_name} {instance_id}\
                                    {attribute_name} {attribute_value}")
                     return
             print("*** Unknown syntax:", line)
