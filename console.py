@@ -30,10 +30,10 @@ class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project."""
     prompt = '(hbnb) '
 
-    
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all(), <class name>.count(),
-        <class name>.show(), <class name>.destroy(), and <class name>.update() syntax."""
+        """Custom method dispatcher to handle <class name>.all(),
+        <class name>.count(), <class name>.show(), <class name>.destroy(),
+        and <class name>.update() syntax."""
         args = line.split('.')
         if len(args) < 2:
             print("*** Unknown syntax: {}".format(line))
@@ -111,10 +111,13 @@ class HBNBCommand(cmd.Cmd):
             attribute_name = command_args[1].strip('"\'')
             attribute_value = command_args[2].strip('"\'')
             self.do_update(
-                f"{class_name} {instance_id} {attribute_name} {attribute_value}")
+                f"{class_name} {instance_id} "
+                f"{attribute_name} {attribute_value}"
+            )
             return
 
         print("*** Unknown syntax: {}".format(line))
+
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
@@ -232,8 +235,9 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
 
-        if len(args) == 3 and args[2].startswith('{') and
-        args[2].endswith('}'):
+        if (len(args) == 3 and
+               args[2].startswith('{') and
+               args[2].endswith('}')):
             try:
                 attribute_dict = eval(args[2])
                 for attribute_name, attribute_value in attribute_dict.items():
