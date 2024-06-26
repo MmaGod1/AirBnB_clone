@@ -30,33 +30,42 @@ class HBNBCommand(cmd.Cmd):
     """Command interpreter for the HBNB project."""
     prompt = '(hbnb) '
 
+    
     def default(self, line):
-        """Custom method dispatcher to handle <class name>.all() and
-        <class name>.count() syntax."""
+        """Custom method dispatcher to handle <class name>.all(), <class name>.count(),
+        <class name>.show(), <class name>.destroy(), and <class name>.update() syntax."""
         args = line.split('.')
         if len(args) < 2:
             print("*** Unknown syntax: {}".format(line))
             return
+
         class_name, command = args[0], args[1]
+
         if class_name not in storage_classes:
             print("** class doesn't exist **")
             return
+
         command_parts = command.split('(')
         if len(command_parts) < 2:
             print("*** Unknown syntax: {}".format(line))
             return
+
         command_name = command_parts[0]
         command_content = command_parts[1].strip(')')
 
         if command_name == "all":
-            all_instances = [str(obj) for key, obj in storage.all().items()
-                             if key.split('.')[0] == class_name]
+            all_instances = [
+                str(obj) for key, obj in storage.all().items()
+                if key.split('.')[0] == class_name
+            ]
             print(all_instances)
             return
 
         if command_name == "count":
-            count = sum(1 for obj in storage.all().values()
-                        if obj.__class__.__name__ == class_name)
+            count = sum(
+                1 for obj in storage.all().values()
+                if obj.__class__.__name__ == class_name
+            )
             print(count)
             return
 
@@ -64,37 +73,48 @@ class HBNBCommand(cmd.Cmd):
             instance_id = command_content.strip('"\'')
             key = "{}.{}".format(class_name, instance_id)
             if key in storage.all():
+                print(storage.all()[key])
+            else:
+                print("** no instance found **")
+            return
+
+        if command_name == "destroy":
+            instance_id = command_content.strip('"\'')
+            key = "{}.{}".format(class_name, instance_id)
+            if key in storage.all():
                 del storage.all()[key]
                 storage.save()
             else:
                 print("** no instance found **")
+            return
+
+        if command_name == "update":
+            command_args = shlex.split(command_content)
+            if (len(command_args) == 2 and
+                    command_args[1].startswith('{') and
+                    command_args[1].endswith('}')):
+                instance_id = command_args[0].strip('"\'')
+                try:
+                    update_dict = json.loads(command_args[1])
+                    for key, value in update_dict.items():
+                        self.do_update(
+                            f"{class_name} {instance_id} {key} {value}")
+                except json.JSONDecodeError:
+                    print("** invalid JSON format **")
                 return
 
-            if command_name == "update":
-                command_args = shlex.split(command_content)
-                if len(command_args) == 2:
-                    instance_id = command_args[0].strip('"\'')
-                    try:
-                        update_dict = json.loads(command_args[1])
-                        for key, value in update_dict.items():
-                            self.do_update(f"{class_name} {instance_id}\
-                                    {key} {value}")
-                    except json.JSONDecodeError:
-                        print("** invalid JSON format **")
-                        return
-                    if len(command_args) < 3:
-                        print("** attribute name or value missing **")
-                        return
+            if len(command_args) < 3:
+                print("** attribute name or value missing **")
+                return
 
-                    instance_id = command_args[0].strip('"\'')
-                    attribute_name = command_args[1].strip('"\'')
-                    attribute_value = command_args[2].strip('"\'')
-                    self.do_update(f"{class_name} {instance_id}\
-                            {attribute_name} {attribute_value}")
-                    return
+            instance_id = command_args[0].strip('"\'')
+            attribute_name = command_args[1].strip('"\'')
+            attribute_value = command_args[2].strip('"\'')
+            self.do_update(
+                f"{class_name} {instance_id} {attribute_name} {attribute_value}")
+            return
 
-                print("*** Unknown syntax: {}".format(line))
-
+        print("*** Unknown syntax: {}".format(line))
     def do_create(self, arg):
         """Usage: create <class>
         Creates a new instance of BaseModel, saves
